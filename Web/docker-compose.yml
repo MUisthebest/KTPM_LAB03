@@ -1,0 +1,26 @@
+version: '1.0'
+
+services:
+  auth-service:
+    build: ./AuthService
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  product-service:
+    build: ./ProductService
+    ports:
+      - "3002:3002"
+    restart: unless-stopped
+
+  order-service:
+    build: ./OrderService
+    ports:
+      - "3003:3003"
+    restart: unless-stopped
+
+  frontend:
+    build: ./Front-End
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

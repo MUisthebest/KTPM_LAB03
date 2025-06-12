@@ -1,0 +1,186 @@
+<section class="product">
+  <div class="search">
+    <form action="/products/search" method="GET">
+      <input type="text" name="query" placeholder="Hãy tìm món gây tiểu đường cho bạn ..." required>
+      <button class="btn-search" type="submit">Tìm kiếm</button>
+    </form>
+  </div>
+  <div class="container">
+    <div class="product-list" id="product-list">
+      <!-- Sản phẩm sẽ được render ở đây -->
+    </div>
+  </div>
+</section>
+<script>
+  async function fetchProducts() {
+    try {
+      const response = await fetch(`${apiBaseUrl}:3002/products`); 
+      const products = await response.json();
+
+      const productList = document.getElementById('product-list');
+      productList.innerHTML = '';
+
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>Giá: $${product.price}</p>
+          <button class="buy-button" data-id="${product.id}">Mua</button>
+        `;
+        productList.appendChild(card);
+      });
+
+      // Gán sự kiện click cho tất cả nút "Mua"
+      document.querySelectorAll('.buy-button').forEach(button => {
+        button.addEventListener('click', async (e) => {
+        const productId = e.target.dataset.id;
+
+        try {
+          const response = await fetch(`${apiBaseUrl}:3001/`, {
+            method: 'GET',
+            credentials: 'include' // Đảm bảo cookie được gửi (để xác thực phiên)
+          });
+
+          if (!response.ok) throw new Error('Không lấy được thông tin người dùng');
+          const data = await response.json();
+
+          const user_id = data.user.id;
+
+          if (!user_id) {
+            alert('Vui lòng đăng nhập trước khi thêm sản phẩm vào giỏ hàng.');
+            return;
+          }
+
+          // Gửi yêu cầu thêm sản phẩm vào giỏ hàng
+          const res = await fetch(`${apiBaseUrl}:3003/orders/cart/add`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              user_id,
+              productId,
+              quantity: 1
+            })
+          });
+
+          const result = await res.json();
+
+          if (res.ok) {
+            alert(`Đã thêm sản phẩm vào giỏ hàng!`);
+          } else {
+            alert(`Lỗi: ${result.error}`);
+          }
+        } catch (err) {
+          console.error('Lỗi khi thêm vào giỏ hàng:', err);
+          alert('Không thể thêm vào giỏ hàng.');
+        }
+      });
+      });
+
+    } catch (error) {
+      console.error('Lỗi khi fetch sản phẩm:', error);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', fetchProducts);
+</script>
+
+<style>
+    .product {
+        display: flex;
+        flex-grow: 1;
+        height: 100vh;
+        flex-direction: column;
+        background: #fff;
+        overflow-y: auto;
+    }
+    .search {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        height: 10vh;
+    }
+    .search form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+    input {
+        width: 60%;
+        padding: 20px;
+        border: 3px solid #8d6e63;
+        border-radius: 15px;
+    }
+    .btn-search {
+        padding: 20px 20px;
+        background-color: #8d6e63;
+        color: white;
+        border: 3px solid #8d6e63;
+        border-radius: 15px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    .input[type="text"] {
+        width: 300px;
+        padding: 10px 20px;
+        border: 1px solid #8d6e63;
+        border-radius: 15px;
+    }
+    input::placeholder {
+        font-weight: bold;
+        color: #8d6e63;
+    }
+    .container {
+        width: 100%;
+        height: 90vh;
+        padding: 30px;
+        gap: 20px;
+    }
+    .container h1 {
+        text-align: center;
+        color: #785143;
+        font-weight: bold;
+        font-size: 30px;
+        margin-bottom: 20px;
+    }
+    .product-list {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .product-card {
+        height: 400px;
+    }
+    .product-card h3 {
+        font-size: 26px;
+        color: #785143;
+        font-weight: bold;
+    }
+    .product-card p {
+        font-size: 20px;
+    }
+    @media screen and (max-width: 1080px) {
+    .product-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    }
+
+    @media screen and (max-width: 760px) {
+    .product {
+        height: auto;
+        flex-grow: 1;
+        overflow: hidden;
+        height: max-content;
+    }
+    .product-list {
+        grid-template-columns: repeat(1, 1fr);
+        height: max-content;
+        flex-grow: 1;
+    }
+    .container{
+        height: auto;
+    }
+    }
+</style>

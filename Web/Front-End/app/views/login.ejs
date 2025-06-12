@@ -1,0 +1,67 @@
+<link rel="stylesheet" href="/css/user.css">
+<section class="login-container">
+    <div class="gif-section">
+      <img src="/media/anim.gif" alt="Coffee Mascot" />
+    </div>
+    <div class="form-section">
+      <h1>Đăng nhập vào Coffee Shop</h1>
+      <h2>Chào bạn!</h2>
+      <p>Đăng nhập để bắt đầu ngày mới ☕</p>
+      <form id="loginForm">
+        <input type="text" placeholder="Tên đăng nhập" required />
+        <input type="password" placeholder="Mật khẩu" required />
+        <button type="submit">Đăng nhập</button>
+      </form>
+      <p class="signup-link">Chưa có tài khoản? <a href="/register">Tạo tài khoản</a></p>
+    </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+  // Kiểm tra đăng nhập khi trang load
+  try {
+    const response = await fetch(`${apiBaseUrl}:3001/check-auth`, {
+      credentials: 'include' // Quan trọng để gửi cookie
+    });
+    
+    const data = await response.json();
+    
+    if (data.isAuthenticated) {
+      // Nếu đã đăng nhập thì redirect về profile
+      window.location.href = '/profile';
+    }
+  } catch (error) {
+    console.error('Lỗi khi kiểm tra đăng nhập:', error);
+    // Giữ nguyên trang login nếu có lỗi
+  }
+  });
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+      username: document.querySelector('#loginForm input[type="text"]').value,
+      password: document.querySelector('#loginForm input[type="password"]').value
+    };
+
+    try {
+      const response = await fetch(`${apiBaseUrl}:3001/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+        credentials: 'include' // Quan trọng: cho phép gửi/nhận cookie
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+      localStorage.setItem('domUpdated', 'false'); // Reset trạng thái DOM
+      alert('Đăng nhập thành công!');
+      window.location.href = '/'; // Trang chủ
+      } else {
+        alert(data.error || 'Đăng nhập thất bại');
+      }
+    } catch (err) {
+      console.error('Lỗi:', err);
+      alert('Lỗi kết nối tới server');
+    }
+  });
+</script>

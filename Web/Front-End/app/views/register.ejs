@@ -1,0 +1,52 @@
+<link rel="stylesheet" href="/css/user.css">
+<section class="login-container">
+  <div class="gif-section">
+    <img src="/media/anim.gif" alt="Coffee Mascot" />
+  </div>
+  <div class="form-section">
+    <h1>Đăng ký tài khoản</h1>
+    <h2>Chào mừng bạn đến với Coffee Shop!</h2>
+    <p>Tạo tài khoản để thưởng thức cà phê mỗi ngày ☕</p>
+    <form id="registerForm" method="POST" action="/register">
+      <input type="text" placeholder="Tên đăng nhập" required />
+      <input type="email" placeholder="Email" required />
+      <input type="password" placeholder="Mật khẩu" required />
+      <input type="password" placeholder="Xác nhận mật khẩu" required />
+      <button type="submit">Đăng ký</button>
+    </form>
+    <p class="signup-link">Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
+  </div>
+</section>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+      username: document.querySelector('#registerForm input[type="text"]').value,
+      email: document.querySelector('#registerForm input[type="email"]').value,
+      password: document.querySelector('#registerForm input[type="password"]').value,
+      confirm_password: document.querySelectorAll('#registerForm input[type="password"]')[1].value
+    };
+
+    try {
+      const response = await fetch(`${apiBaseUrl}:3001/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Đăng ký thành công!');
+        window.location.href = '/login';
+      } else {
+        alert(data.error || 'Đăng ký thất bại');
+      }
+    } catch (err) {
+      console.error('Lỗi:', err);
+      alert('Lỗi kết nối tới server');
+    }
+  });
+</script>
