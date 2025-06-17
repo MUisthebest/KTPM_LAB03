@@ -21,6 +21,24 @@ exports.getProductById = async (req, res) => {
   }
 };
 
+exports.getProductsByIds = async (req, res) => {
+  try {
+    const { ids } = req.body; // nhận mảng id từ body
+    if (!Array.isArray(ids)) {
+      return res.status(400).json({ message: 'Invalid ids array' });
+    }
+
+    const placeholders = ids.map((_, i) => `$${i + 1}`).join(', ');
+    const query = `SELECT id, name, image, price FROM products WHERE id IN (${placeholders})`;
+    const result = await Product.query(query, ids);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 exports.createProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);

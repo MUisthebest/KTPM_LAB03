@@ -1,13 +1,30 @@
 const Order = require('../models/Order');
+const axios = require('axios');
 exports.getCart = async (req, res) => {
   try {
-    const cart = await Order.getCartByUser(req.params.userId);
+    const items = await Order.getCartByUser(req.params.userId); // [{ product_ids: [...] }]
 
-    if (!cart || cart.length === 0) {
-      return res.json([])
+    if (!items || items.length === 0) {
+      return res.json([]);
     }
 
-    res.json(cart); // giờ đã bao gồm name và price
+    const nestedItems = items[0]?.product_ids || [];
+    const ids = nestedItems.map(item => item.productId);
+
+    const response = await axios.post(`http://localhost:3002/products/batch`, { ids });
+
+    products = response.data;
+
+
+    const cart = products.map(product => {
+      const item = nestedItems.find(i => i.productId == product.id);
+      return {
+        ...product,
+        quantity: item ? item.quantity : 0
+      };
+    });
+
+    res.json(cart);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Get cart failed' });
@@ -22,6 +39,7 @@ exports.updateCart = async (req, res) => {
     res.status(500).json({ error: 'Update cart failed' });
   }
 };
+
 
 exports.addProductToCart = async (req, res) => {
       try {
@@ -126,13 +144,37 @@ exports.getOrderById = async (req, res) => {
       return res.status(404).json({ error: 'Order not found or you do not have access' });
     }
 
-    res.json(order);
+    const productItems = order.product_ids || [];
+
+    const ids = productItems.map(item => item.productId);
+
+
+    // Gọi Product Service để lấy chi tiết sản phẩm
+    const { data: products } = await axios.post('http://localhost:3002/products/batch', {
+      ids
+    });
+
+
+    // Gộp thông tin product với quantity
+    const detailedProducts = productItems.map(item => {
+      const product = products.find(p => p.id === Number(item.productId));
+      return {
+        ...product,
+        quantity: item.quantity
+      };
+    });
+
+    // Trả về đơn hàng với chi tiết sản phẩm
+    res.json({
+      ...order,
+      product_ids: detailedProducts
+    });
+
   } catch (error) {
     console.error('Get order failed:', error);
     res.status(500).json({ error: 'Server error', details: error.message });
   }
 };
-
 exports.updateOrder = async (req, res) => {
   try {
     const updated = await Order.update(req.params.id, req.body);

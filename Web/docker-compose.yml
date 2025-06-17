@@ -3,18 +3,21 @@ version: '1.0'
 services:
   auth-service:
     build: ./AuthService
+    image: 22127471/auth-service
     ports:
       - "3001:3001"
     restart: unless-stopped
 
   product-service:
     build: ./ProductService
+    image: 22127471/product-service
     ports:
       - "3002:3002"
     restart: unless-stopped
 
   order-service:
     build: ./OrderService
+    image: 22127471/order-service
     ports:
       - "3003:3003"
     restart: unless-stopped

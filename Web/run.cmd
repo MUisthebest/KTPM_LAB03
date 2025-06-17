@@ -13,7 +13,7 @@ echo DB_HOST=mldb.postgres.database.azure.com > AuthService\.env
 echo DB_PORT=5432 >> AuthService\.env
 echo DB_USER=ml_admin >> AuthService\.env
 echo DB_PASSWORD="ml#web_db#2224" >> AuthService\.env
-echo DB_NAME=coffee >> AuthService\.env
+echo DB_NAME=user >> AuthService\.env
 echo PORT=3001 >> AuthService\.env
 echo JWT_SECRET=my_super_secret_key_123456 >> AuthService\.env
 
@@ -22,7 +22,7 @@ echo DB_HOST=mldb.postgres.database.azure.com > ProductService\.env
 echo DB_PORT=5432 >> ProductService\.env
 echo DB_USER=ml_admin >> ProductService\.env
 echo DB_PASSWORD="ml#web_db#2224" >> ProductService\.env
-echo DB_NAME=coffee >> ProductService\.env
+echo DB_NAME=product >> ProductService\.env
 echo PORT=3002 >> ProductService\.env
 echo JWT_SECRET=my_super_secret_key_123456 >> ProductService\.env
 
@@ -31,7 +31,7 @@ echo DB_HOST=mldb.postgres.database.azure.com > OrderService\.env
 echo DB_PORT=5432 >> OrderService\.env
 echo DB_USER=ml_admin >> OrderService\.env
 echo DB_PASSWORD="ml#web_db#2224" >> OrderService\.env
-echo DB_NAME=coffee >> OrderService\.env
+echo DB_NAME=order >> OrderService\.env
 echo PORT=3003 >> OrderService\.env
 echo JWT_SECRET=my_super_secret_key_123456 >> OrderService\.env
 
@@ -43,6 +43,19 @@ echo ======================================
 echo [+] Building Docker images...
 echo ======================================
 docker-compose up --build
+
+echo ======================================
+echo [+] Tagging and pushing images...
+echo ======================================
+
+docker tag auth-service 22127471/auth-service
+docker tag product-service 22127471/product-service
+docker tag order-service 22127471/order-service
+
+docker push 22127471/auth-service
+docker push 22127471/product-service
+docker push 22127471/order-service
+
 echo ======================================
 echo [DONE] Docker images built successfully.
 echo ======================================
