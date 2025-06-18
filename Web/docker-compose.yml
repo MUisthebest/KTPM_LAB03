@@ -24,6 +24,7 @@ services:
 
   frontend:
     build: ./Front-End
+    image: 22127471/frontend
     ports:
       - "8080:8080"
     restart: unless-stopped

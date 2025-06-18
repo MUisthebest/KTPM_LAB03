@@ -51,10 +51,12 @@ echo ======================================
 docker tag auth-service 22127471/auth-service
 docker tag product-service 22127471/product-service
 docker tag order-service 22127471/order-service
+docker tag front-end 22127471/front-end
 
 docker push 22127471/auth-service
 docker push 22127471/product-service
 docker push 22127471/order-service
+docker push 22127471/front-end
 
 echo ======================================
 echo [DONE] Docker images built successfully.

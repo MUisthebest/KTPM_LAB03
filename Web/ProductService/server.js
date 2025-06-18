@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 3002;
 const hostURL = process.env.HOST_URL || "http://localhost:8080";
 
-app.use(cors({ origin: hostURL, credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 app.use("/products", productRoutes);

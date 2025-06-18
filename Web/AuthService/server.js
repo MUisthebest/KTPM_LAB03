@@ -11,7 +11,7 @@ app.use(cookieParser());
 
 const hostURL = process.env.HOST_URL || 'http://localhost:8080';
 const corsOptions = {
-  origin: hostURL, 
+  origin: true, 
   credentials: true,          
 };
 app.use(cors(corsOptions));
