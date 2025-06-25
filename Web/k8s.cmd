@@ -18,10 +18,6 @@ REM Step 3: Set Docker environment for Minikube
 echo 🔧 Setting Docker environment...
 for /f "tokens=*" %%i in ('minikube docker-env --shell cmd ^| findstr /V "REM"') do %%i
 
-echo HOST_URL = "http://coffee-and-chill.com" >> OrderService\.env
-echo HOST_URL = "http://coffee-and-chill.com" >> ProductService\.env
-echo HOST_URL = "http://coffee-and-chill.com" >> AuthService\.env
-
 
 REM Step 4: Apply ConfigMaps
 echo 📦 Applying config files...
